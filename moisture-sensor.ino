@@ -5,7 +5,7 @@
 int ledPins[] = {3, 4, 5, 6, 7};
 
 int sensorValue = 0;  // variable to store the value coming from the sensor
- 
+
 int ledLevel = 0;
 
 long timer = 0;
@@ -35,10 +35,9 @@ void setup() {
 	Serial.println(sensorValue);
 	digitalWrite(ENABLER_PIN, LOW);
 }
- 
+
 void loop() {
 
-	
 	unsigned long currentTime = millis();
 	if ((unsigned long)(currentTime - timer) >= TIME_INTERVAL) {
 
@@ -50,14 +49,14 @@ void loop() {
 		// disable probe after reading values
 		digitalWrite(ENABLER_PIN, LOW);
 
-		
+
 
 		// breakpoints for different led levels:
 		if (sensorValue > 550) ledLevel = 5;
 		if (sensorValue < 550) ledLevel = 4;
 		if (sensorValue < 450) ledLevel = 3;
 		if (sensorValue < 350) ledLevel = 2;
-		if (sensorValue < 250) ledLevel = 1;		
+		if (sensorValue < 250) ledLevel = 1;
 		setLedLevel(ledLevel);
 
 		// debug data
@@ -67,7 +66,7 @@ void loop() {
 		// save time
 		timer = currentTime;
 	}
-									
+
 }
 
 void setLedLevel(int level) {
@@ -78,7 +77,7 @@ void setLedLevel(int level) {
 
 	for (int pin = 0; pin < ledArraySize; pin++ ) {
 		pinMode(ledPins[pin], OUTPUT);
-		if (level >= pin+1) 
+		if (level >= pin+1)
 			digitalWrite(ledPins[pin], HIGH);
 		else
 			digitalWrite(ledPins[pin], LOW);
