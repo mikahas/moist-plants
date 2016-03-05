@@ -1,4 +1,9 @@
-#define TIME_INTERVAL 1000
+// Hygrometer
+// version: 0.1
+// Author: Mika Hassinen
+
+
+#define TIME_INTERVAL 1000	// 1000 ms interval
 #define ENABLER_PIN 2		// output pin that enables the sensor while reading the value
 #define SENSOR_PIN A1		// input pin for the sensor
 
@@ -26,10 +31,10 @@ void setup() {
 	}
 	delay(1000);
 	setLedLevel(0);
-	delay(100);
 
 	// test sensor
 	digitalWrite(ENABLER_PIN, HIGH);
+	delay(100);
 	sensorValue = analogRead(SENSOR_PIN);
 	Serial.print("[DEBUG]: test read value: ");
 	Serial.println(sensorValue);
@@ -43,13 +48,11 @@ void loop() {
 
 		// enable probe
 		digitalWrite(ENABLER_PIN, HIGH);
-		delay(10);
+		delay(100);
 		// read the value from the sensor:
 		sensorValue = analogRead(SENSOR_PIN);
 		// disable probe after reading values
 		digitalWrite(ENABLER_PIN, LOW);
-
-
 
 		// breakpoints for different led levels:
 		if (sensorValue > 550) ledLevel = 5;
