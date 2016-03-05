@@ -16,7 +16,7 @@ USB charger and that should be enough for the sensor as well.
 ### Components
 
 - Moisture sensor, mine has "Moisture Sensor Meroduino" printed on it
-- 5 LEDs, I like to have lots of colors so I chose blue, green and red
+- 5 LEDs, I chose blue, green and red
 - 5 resistors (e.g. 220 ohm) for the LEDs
 - 1 general purpose NPN transistor
 - 1 kOhm resistor for the sensor enabler pin

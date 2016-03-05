@@ -1,5 +1,5 @@
 // Arduino Hygrometer
-// version: 0.1
+// version: 0.2
 // Author: Mika Hassinen
 
 
@@ -61,6 +61,7 @@ void loop() {
 		digitalWrite(ENABLER_PIN, LOW);
 
 		// thresholds for different LED levels:
+		// You may want to tweak these values depending on the readings of your sensor
 		if (sensorValue >= 550) newLedLevel = 5;
 		if (sensorValue < 550) newLedLevel = 4;
 		if (sensorValue < 450) newLedLevel = 3;
