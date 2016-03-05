@@ -1,4 +1,4 @@
-# Moist plants v0.2
+# Moist plants
 
 Create a soil hygrometer using an Arduino and check the moisture levels of your plant!
 
