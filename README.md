@@ -15,7 +15,15 @@ USB charger and that should be enough for the sensor as well.
 
 ### Components
 
-- Moisture sensor, mine has "Moisture Sensor Meroduino" printed on it
+- Moisture sensor (resistive type), mine has "Moisture Sensor Meroduino" printed on it
 - 5 LEDs, I chose blue, green and red
 - 5 resistors (e.g. 220 ohm) for the LEDs
 - Wires and a breadboard
+
+## Pros & cons
+
++ Simple to make
++ Affordable: Arduino, sensor & LEDs cost less than 20 €
++ Beginner project
+- continuous DC voltage damages the sensor
+- not a long term solution due to sensor damage
