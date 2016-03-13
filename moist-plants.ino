@@ -125,7 +125,3 @@ int readSensor() {
 	average = (int)(sum/50.0);
 	return average;
 }
-
-void enableProbe() {
-
-}
