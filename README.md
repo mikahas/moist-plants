@@ -22,8 +22,8 @@ USB charger and that should be enough for the sensor as well.
 
 ## Pros & cons
 
-+ Simple to make
-+ Affordable: Arduino, sensor & LEDs cost less than 20 €
-+ Beginner project
-- continuous DC voltage damages the sensor
-- not a long term solution due to sensor damage
++ + Simple to make
++ + Affordable: Arduino, sensor & LEDs cost less than 20 €
++ + Beginner project
+- - continuous DC voltage damages the sensor
+- - not a long term solution due to sensor damage
