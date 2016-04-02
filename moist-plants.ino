@@ -1,13 +1,20 @@
 // Arduino Hygrometer
-// version: 0.3
+// version: 0.4
 // Author: Mika Hassinen
 
-#define TIME_INTERVAL 5000	// 5000 ms interval
+#define TIME_INTERVAL 60000	// 60 second interval
 #define FLASH_TIME_INTERVAL 400	// 400 ms flash interval
 #define SENSOR_PIN A1		// input pin for the sensor
-#define LOW_LEVEL_THRESHOLD 200	// minimum threshold for the water level (=desert dry soil)
+
+// moisture sensor test values
+// 0% humidity (air):	575
+// 100% humidity (water): 285
+#define MIN_LEVEL 300	// 99% humidity
+#define MAX_LEVEL 550	// 1% humidity
+#define LOW_LEVEL_THRESHOLD 1	// minimum threshold for the water level (=desert dry soil)
 
 int ledPins[] = {3, 4, 5, 6, 7, 8, 9, 10, 11};
+int ledArraySize = (sizeof(ledPins)/sizeof(int));
 
 int sensorValue = 0;  // variable to store the value coming from the sensor
 
@@ -34,6 +41,10 @@ void setup() {
 	delay(1000);	// show all LEDs on for a second
 	setLedLevel(0);
 
+	// print led array size
+	Serial.print("[DEBUG]: led count: ");
+	Serial.println(ledArraySize);
+
 	// test sensor
 	sensorValue = readSensor();
 	Serial.print("[DEBUG]: test read value: ");
@@ -50,13 +61,9 @@ void loop() {
 		// read the value from the sensor:
 		sensorValue = readSensor();
 
-		// thresholds for different LED levels:
-		// You may want to tweak these values depending on the readings of your sensor
-		if (sensorValue >= 550) newLedLevel = 9;
-		if (sensorValue < 550) newLedLevel = 7;
-		if (sensorValue < 450) newLedLevel = 5;
-		if (sensorValue < 350) newLedLevel = 3;
-		if (sensorValue < 250) newLedLevel = 1;
+		// since the sensor values are reversed (bigger value is dry and smaller value is moist)
+		// we should reverse the led values at this point
+		newLedLevel = map(sensorValue, MIN_LEVEL, MAX_LEVEL, ledArraySize, 1);
 
 		// update if the value changes
 		if (ledLevel != newLedLevel) {
@@ -65,8 +72,10 @@ void loop() {
 		}
 
 		// debug data
-		Serial.print("[DEBUG]: current value: ");
-		Serial.println(sensorValue);
+		Serial.print("[DEBUG]: current value, led level: ");
+		Serial.print(sensorValue);
+		Serial.print("\t");
+		Serial.println(ledLevel);
 
 		// save time
 		timer = currentTime;
@@ -75,7 +84,7 @@ void loop() {
 	// flash red LED if water level is below threshold
 	if ((unsigned long)(currentTime - flashTimer) >= FLASH_TIME_INTERVAL) {
 
-		if (sensorValue < LOW_LEVEL_THRESHOLD) {
+		if (ledLevel <= LOW_LEVEL_THRESHOLD) {
 			if (blink)
 				setLedLevel(1);	// turn on first (red) LED
 			else
@@ -89,12 +98,13 @@ void loop() {
 
 }
 
+// TODO: do function that handles the sensor reading and led update
+
 /**
  * Ligts LEDs according to given level where 0 is all LEDs are OFF and 5 is all LEDs are ON
  * @param Integer level number of leds to light up from 0 to 5
  */
 void setLedLevel(int level) {
-	int ledArraySize = (sizeof(ledPins)/sizeof(int));
 	if (level < 0) level = 0;
 	if (level > (ledArraySize) ) level = ledArraySize;
 
@@ -123,5 +133,10 @@ int readSensor() {
 
 	// cast to int
 	average = (int)(sum/50.0);
+
+	// limit sensor reading between min & max calibration values
+	average = min(average, MAX_LEVEL);	// min: the smaller of two numbers
+	average = max(average, MIN_LEVEL);	// max: the bigger of two numbers
+
 	return average;
 }
