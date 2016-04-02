@@ -6,7 +6,9 @@
 #define FLASH_TIME_INTERVAL 400	// 400 ms flash interval
 #define SENSOR_PIN A1		// input pin for the sensor
 
-// moisture sensor test values
+// To test the capacitive sensor put it in a body of water and read the value of 100 % humidity
+// 0 % is measured when the sensor is held in air and not touching anything.
+// moisture sensor test values:
 // 0% humidity (air):	575
 // 100% humidity (water): 285
 #define MIN_LEVEL 300	// 99% humidity
