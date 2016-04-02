@@ -40,45 +40,23 @@ void setup() {
 	}
 	delay(1000);	// show all LEDs on for a second
 	setLedLevel(0);
+	delay(400);	// add a short delay so the transition to real led level is more subtle
 
 	// print led array size
 	Serial.print("[DEBUG]: led count: ");
 	Serial.println(ledArraySize);
 
-	// test sensor
-	sensorValue = readSensor();
-	Serial.print("[DEBUG]: test read value: ");
-	Serial.println(sensorValue);
+	// update LEDs now
+	doUpdate();
 }
 
 void loop() {
 
 	unsigned long currentTime = millis();
-	int newLedLevel;
 
 	if ((unsigned long)(currentTime - timer) >= TIME_INTERVAL) {
-
-		// read the value from the sensor:
-		sensorValue = readSensor();
-
-		// since the sensor values are reversed (bigger value is dry and smaller value is moist)
-		// we should reverse the led values at this point
-		newLedLevel = map(sensorValue, MIN_LEVEL, MAX_LEVEL, ledArraySize, 1);
-
-		// update if the value changes
-		if (ledLevel != newLedLevel) {
-			ledLevel = newLedLevel;
-			setLedLevel(ledLevel);
-		}
-
-		// debug data
-		Serial.print("[DEBUG]: current value, led level: ");
-		Serial.print(sensorValue);
-		Serial.print("\t");
-		Serial.println(ledLevel);
-
-		// save time
-		timer = currentTime;
+		doUpdate();
+		timer = currentTime; // save time
 	}
 
 	// flash red LED if water level is below threshold
@@ -99,6 +77,27 @@ void loop() {
 }
 
 // TODO: do function that handles the sensor reading and led update
+void doUpdate() {
+	int newLedLevel;
+	// read the value from the sensor:
+	sensorValue = readSensor();
+
+	// since the sensor values are reversed (bigger value is dry and smaller value is moist)
+	// we should reverse the led values at this point
+	newLedLevel = map(sensorValue, MIN_LEVEL, MAX_LEVEL, ledArraySize, 1);
+
+	// update if the value changes
+	if (ledLevel != newLedLevel) {
+		ledLevel = newLedLevel;
+		setLedLevel(ledLevel);
+	}
+
+	// debug data
+	Serial.print("[DEBUG]: current value, led level: ");
+	Serial.print(sensorValue);
+	Serial.print("\t");
+	Serial.println(ledLevel);
+}
 
 /**
  * Ligts LEDs according to given level where 0 is all LEDs are OFF and 5 is all LEDs are ON
