@@ -4,7 +4,7 @@ Create a soil hygrometer using an Arduino and check the moisture levels of your 
 
 This small project lights up 1-9 LEDs depending to the soil moisture level.
 
-### notes
+### Notes
 
 It is important to use a capacitive soil moisture sensor so the sensor elements are underneath a protective film. Resistive soil moisture sensors rely on measuring the resistance between two rods of metal which are exposed to water and salts in the ground which can cause corrosion. Also the DC current between the resistive sensor rods are creating an electrolysis and oxidation in the metal.
 
@@ -26,8 +26,8 @@ USB charger and that should be enough for the sensor as well.
 
 ## Pros & cons
 
-+ + Simple to make
-+ + Affordable: Arduino, sensor & LEDs cost less than 20 €
-+ + Beginner project
-- - continuous DC voltage damages the sensor
-- - not a long term solution due to sensor damage
++ + Simple to make, suitable for beginners
++ + fun to build
++ + Affordable: Arduino, sensor & LEDs cost less than 20 €, the most expensive part is the sensor (mine cost about 10 €)
++ + helps to keep the plants watered
+- - continuous DC voltage damages the sensor (only if you use a resistive type sensor)
