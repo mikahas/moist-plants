@@ -40,22 +40,27 @@ long timer, flashTimer = 0;
 
 void setup() {
 
-	// setup outputs
+	// setup sensors as inputs
 	pinMode(SENSOR_PIN, INPUT);
+	pinMode(BRIGHTNESS_PIN, INPUT);
 
 	FastLED.addLeds<NEOPIXEL, DATA_PIN>(smartLed, NUM_LEDS);
 	setLedLevel(0);
 	delay(400);	// add a short delay so the transition to real led level is more subtle
 	for (int i = 0; i < MAX_LED_VALUE; i++) {
 		setLedLevel(i);
-		delay(25);
+		delay(10);
 	}
 }
 
 void loop() {
 
+	// Unsigned long (32 bits, 4 bytes) ranges from 0 to 4 294 967 295.
+	// Unsigned variables do not store negative values.
+	// This means that rollover will occur in about 49 days
 	unsigned long currentTime = millis();
 
+	// avoid rollover
 	if ((unsigned long)(currentTime - timer) >= TIME_INTERVAL) {
 		doUpdate();
 		timer = currentTime; // save time
@@ -124,7 +129,7 @@ void setLedLevel(int level) {
 }
 
 /**
- * Read moisture sensor multiple times and return the average
+ * Read sensor multiple times and return the average
  * @return Integer
  */
 int readSensor(int sensorPin, int min, int max) {
