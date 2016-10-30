@@ -2,7 +2,9 @@
 
 Create a soil hygrometer using an Arduino and check the moisture levels of your plant!
 
-This small project lights up 1-9 LEDs depending to the soil moisture level. If the moisture level gets really low, the red led starts blinking.
+This bad boy lights up a color changing led from red to green depending to the soil moisture level. If the moisture level gets really low, the LED starts blinking red.
+
+[Picture of the finished project](https://www.flickr.com/photos/133800349@N02/26164452130/in/dateposted-public/)
 
 ### Notes
 
@@ -20,8 +22,7 @@ USB charger and that should be enough for the sensor as well.
 ### Components
 
 - Moisture sensor (capacitive type)
-- 9 LEDs, I chose blue, green and red
-- 9 resistors (e.g. 220 ohm) for the LEDs
+- One fastled (WS2812B) to change colors
 - Wires and a breadboard
 
 ## Pros & cons
