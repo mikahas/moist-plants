@@ -8,11 +8,10 @@ This bad boy lights up a color changing LED from red to green depending on the s
 
 ## future devopment
 
-- possibility to use potentiometers to set the range for optimum soil moisture levels
--- useful for plants with different thirstiness
+- possibility to use potentiometers to set the range for optimum soil moisture levels. (Useful for plants with different thirstiness.)
 - 3D printed casing
 
-### Notes
+## Notes
 
 It is important to use a capacitive soil moisture sensor so the sensor elements are underneath a protective film. Resistive soil moisture sensors rely on measuring the resistance between two rods of metal which are exposed to water and salts in the ground which can cause corrosion. Also the DC current between the resistive sensor rods are creating an electrolysis and oxidation in the metal.
 
