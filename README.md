@@ -2,7 +2,7 @@
 
 Create a soil hygrometer using an Arduino and check the moisture levels of your plant!
 
-This bad boy lights up a color changing led from red to green depending to the soil moisture level. If the moisture level gets really low, the LED starts blinking red.
+This bad boy lights up a color changing LED from red to green depending on the soil moisture level. If the moisture level gets really low, the LED starts blinking red.
 
 [Picture of the finished project](https://www.flickr.com/photos/133800349@N02/26164452130/in/dateposted-public/)
 
