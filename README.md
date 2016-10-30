@@ -6,7 +6,7 @@ This bad boy lights up a color changing LED from red to green depending on the s
 
 [Picture of the finished project](https://www.flickr.com/photos/133800349@N02/30547128132/in/dateposted-public/)
 
-## future devopment
+## Future devopment
 
 - possibility to use potentiometers to set the range for optimum soil moisture levels. (Useful for plants with different thirstiness.)
 - 3D printed casing
