@@ -1,111 +1,139 @@
-// Arduino Hygrometer
-// version: 1.0.1
+// Moist Plants
+// version: 2.0
 // Author: Mika Hassinen
 
+#define FASTLED_INTERNAL  // disable pragma message for fastled
 #include <FastLED.h>
 
-// fastled defines
-#define NUM_LEDS 1
-#define DATA_PIN 0
-#define MAX_LED_VALUE 255
+#include "config.h"
 
-// timer and sensor
-#define TIME_INTERVAL 1000  // 1 second interval
-#define FLASH_TIME_INTERVAL 400 // 400 ms flash interval
-#define MOISTURE_SENSOR_PIN A1    // input pin for the sensor
+int sensorMoistureValue;
+int sensorLDRValue;
 
-// To test the capacitive sensor put it in a body of water and read the value of 100 % humidity
-// 0 % is measured when the sensor is held in air and not touching anything.
-// moisture sensor test values:
-// 0% humidity (air): 575
-// 100% humidity (water): 285
-#define MOISTURE_LEVEL_MIN 300  // 99% humidity
-#define MOISTURE_LEVEL_MAX 450  // 1% humidity
-#define LOW_LEVEL_THRESHOLD 1 // minimum threshold for the water level (=desert dry soil)
+int ledLevel;
+int blinkCounter;
+int moistureLevelMin;
+int ledBrightness;
+CRGB smartLed[LED_COUNT];
 
-#define BRIGHTNESS_OFF 0
-#define BRIGHTNESS_MIN 10
-#define BRIGHTNESS_MAX 150
-#define BRIGHTNESS_THRESHOLD 70
-#define PHOTORESISTOR_PIN A2
+bool blink;
 
-int sensorValue = 0;  // variable to store the value coming from the sensor
-int brightnessValue = 0;
-
-int ledLevel = 0;
-CRGB smartLed[NUM_LEDS];
-
-bool blink = false;
-
-long timer, flashTimer = 0;
-
+/**
+ * Setup pins and variables, initialise LED and run initialisation animation
+ */
 void setup() {
-
-	// setup sensors as inputs
-	pinMode(MOISTURE_SENSOR_PIN, INPUT);
-	pinMode(PHOTORESISTOR_PIN, INPUT);
+	// setup pins
+	pinMode(BUTTON_PIN, INPUT);
+	pinMode(SENSOR_LDR_PIN, INPUT);
+	pinMode(SENSOR_MOISTURE_PIN, INPUT);
 
 	// set initial values
-	sensorValue = MOISTURE_LEVEL_MAX;
-	brightnessValue = 1024;
+	sensorMoistureValue = MOISTURE_LEVEL_MIN;
+	sensorLDRValue = LOW_LIGHT_THRESHOLD;
+	moistureLevelMin = MOISTURE_LEVEL_MIN;
+	blink = false;
+	ledBrightness = LED_BRIGHTNESS_MAX;
 
-	// Serial.print("test led");
-	FastLED.addLeds<NEOPIXEL, DATA_PIN>(smartLed, NUM_LEDS);
-	setLedLevel(10);
-	delay(400); // add a short delay so the transition to real led level is more subtle
-	for (int i = 0; i < MAX_LED_VALUE; i+=10) {
-		setLedLevel(i);
-		delay(100);
+	// initialise fastled
+	FastLED.addLeds<NEOPIXEL, LED_DATA_PIN>(smartLed, LED_COUNT);
+
+	// animate all led levels from red to green
+	for (int level=0; level < LED_LEVEL_MAX; level+=1) {
+		setLedLevel(level);
+		delay(10);
 	}
-	delay(400);
-	smartLed[0].setRGB(230, 230, 250);  // purple
+
+	// show blue at the end of the animation
+	smartLed[0].setRGB(10, 10, 250);
 	FastLED.show();
-	delay(400);
+
+	delay(DELAY_PAUSE);
 }
 
+/**
+ * Main Arduino loop.
+ * Read button, sensors and update the LED
+ */
 void loop() {
-
-	// Unsigned long (32 bits, 4 bytes) ranges from 0 to 4 294 967 295.
-	// Unsigned variables do not store negative values.
-	// This means that rollover will occur in about 49 days
-	unsigned long currentTime = millis();
-
-	// // avoid rollover
-	if ((unsigned long)(currentTime - timer) >= TIME_INTERVAL) {
-		doUpdate();
-		timer = currentTime; // save time
-	}
-
-	// flash red LED if water level is below threshold
-	if ((unsigned long)(currentTime - flashTimer) >= FLASH_TIME_INTERVAL) {
-
-		if (ledLevel <= LOW_LEVEL_THRESHOLD) {
-			if (blink) setLedLevel(0); // turn off all LEDs
-			else setLedLevel(ledLevel);
-			blink = !blink;
-		}
-
-		flashTimer = currentTime;
-	}
-
+	readButton();
+	readSensors();
+	updateBrightness();
+	updateLED();
+	blinkLED();
+	// reading both LDR and moisture sensors takes 100 ms so the real delay is 100ms + DELAY_UPDATE
+	delay(DELAY_UPDATE);
 }
 
-// TODO: do function that handles the sensor reading and led update
-void doUpdate() {
-	int newLedLevel;
-	// read the value from the sensor:
-	sensorValue = readSensor(MOISTURE_SENSOR_PIN, MOISTURE_LEVEL_MIN, MOISTURE_LEVEL_MAX);
-	brightnessValue = readSensor(PHOTORESISTOR_PIN, 0, 1024); //
+/**
+ * Read button state and set minimum moisture sensor level. Smaller sensor value is more moist soil.
+ * Used to set the optimum soil moisture level after the plant has been watered properly.
+ */
+void readButton() {
+	bool buttonState = digitalRead(BUTTON_PIN);
 
+  // check if the pushbutton is pressed. If it is, the buttonState is HIGH:
+  if (buttonState == HIGH) {
+    moistureLevelMin = readSensor(SENSOR_MOISTURE_PIN, MOISTURE_LEVEL_MIN, MOISTURE_LEVEL_MAX);
+    ledLevel = LED_LEVEL_OFF;	// set LED off momentarily to reset update
+    // confirmation color
+    smartLed[0].setRGB(10, 10, 250);  // blue
+    FastLED.show();
+    delay(DELAY_PAUSE);
+  }
+
+  // TODO: reset moisture min level when button is pressed longer
+  // TODO: blink blue light if soil is too moist?
+}
+
+/**
+ * Read moisture and LDR sensor values
+ * This takes approximately 50 ms / sensor so total read time is 100ms for two sensors
+ */
+void readSensors() {
+	sensorMoistureValue = readSensor(SENSOR_MOISTURE_PIN, moistureLevelMin, MOISTURE_LEVEL_MAX);
+	sensorLDRValue = readSensor(SENSOR_LDR_PIN, LDR_LEVEL_MIN, LDR_LEVEL_MAX);
+}
+
+/**
+ * Set LED brightness value using LDR sensor value
+ */
+void updateBrightness() {
+	if (sensorLDRValue >= LOW_LIGHT_THRESHOLD) ledBrightness = LED_BRIGHTNESS_MAX;
+	else ledBrightness = LED_BRIGHTNESS_MIN;
+}
+
+/**
+ * Update LED color using moisture sensor value
+ */
+void updateLED() {
 	// sensor values are reversed (bigger value is dry and smaller value is moist)
-	newLedLevel = map(sensorValue, MOISTURE_LEVEL_MIN, MOISTURE_LEVEL_MAX, 255, 1);
+	int newLedLevel = map(
+		sensorMoistureValue,
+		moistureLevelMin,
+		MOISTURE_LEVEL_MAX,
+		LED_LEVEL_MAX,
+		LED_LEVEL_MIN
+	);
 
-	// update if the value changes
+	// update only if the value changes
 	if (ledLevel != newLedLevel) {
 		ledLevel = newLedLevel;
 		setLedLevel(ledLevel);
 	}
+}
 
+/**
+ * Blink red when the soil is dry
+ */
+void blinkLED() {
+	if (ledLevel <= LOW_LEVEL_THRESHOLD && blinkCounter % 2 == 0) {
+		if (blink) setLedLevel(LED_LEVEL_OFF); // turn LED off
+		else setLedLevel(ledLevel);
+		blink = !blink;
+	}
+
+	if (blinkCounter > 2) blinkCounter = 0;
+	else blinkCounter++;
 }
 
 /**
@@ -113,26 +141,21 @@ void doUpdate() {
  * @param Integer level number of leds to light up from 0 to 5
  */
 void setLedLevel(int level) {
-
 	int ledR = 0,
 		ledG = 0,
 		ledB = 0;
 
 	// turn off LED if level is zero
 	if (level == 0) {
-		FastLED.setBrightness(BRIGHTNESS_OFF);
+		FastLED.setBrightness(LED_BRIGHTNESS_OFF);
 	} else {
-		if (brightnessValue > BRIGHTNESS_THRESHOLD)
-			FastLED.setBrightness(BRIGHTNESS_MAX);
-		else FastLED.setBrightness(BRIGHTNESS_MIN);
+		level = map(level, LED_LEVEL_MIN, LED_LEVEL_MAX, 0, 255);
+		FastLED.setBrightness(ledBrightness);
 	}
 
-	// reverse LED level so red is shown when the soil is dry and green when moist
-	level = map(constrain(level, 0, MAX_LED_VALUE), 0, 255, 255, 0);
-
 	// this changes the led color from red to yellow to green
-	ledR = constrain(2 * level, 0, 255);
-	ledG = constrain(2 * (255 - level), 0, 255);
+	ledR = 255 - level;
+	ledG = level;
 
 	// set led color and show it to the world
 	smartLed[0].setRGB(ledR, ledG, ledB);
@@ -144,11 +167,11 @@ void setLedLevel(int level) {
  * @return Integer
  */
 int readSensor(int sensorPin, int min, int max) {
-	int sensorValue, average;
+	int sensorMoistureValue, average;
 	float sum;
 	for (int i = 0; i < 50; i++) {
-		sensorValue = analogRead(sensorPin);
-		sum += sensorValue;
+		sensorMoistureValue = analogRead(sensorPin);
+		sum += sensorMoistureValue;
 		delay(1);
 	}
 
@@ -161,4 +184,3 @@ int readSensor(int sensorPin, int min, int max) {
 
 	return constrain(average, min, max);
 }
-
