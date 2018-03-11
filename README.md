@@ -2,13 +2,15 @@
 
 Moist Plants is a soil hygrometer which uses an Arduino to check the moisture levels of your plant soil!
 
-This bad boy lights up a color changing LED from red to green depending on the soil moisture level. If the moisture level gets really low, the LED starts blinking red.
+This bad boy lights up a color changing LED (WS2812) from red to green depending on the soil moisture level. If the moisture level gets really low, the LED starts blinking red.
 
 It features a button to set the optimum moisture level. Button is pressed when the plant is watered and the soil is at the desired moisture level.
 
 An LDR (Light Dependand Resistor) is used to measure the ambient light to dim the LED at night.
 
-[Picture of the project](https://www.flickr.com/photos/133800349@N02/30547128132/in/dateposted-public/)
+[ATTiny85 running Moist Plants](https://flic.kr/p/25298V3)
+
+[Test setup with Arduino UNO](https://flic.kr/p/2526eXu)
 
 ## Future devopment
 

@@ -6,7 +6,7 @@
 #define LED_BRIGHTNESS_OFF 0
 #define LED_BRIGHTNESS_MIN 10
 #define LED_BRIGHTNESS_MAX 150
-#define LED_DATA_PIN 6	// data output pin for LED
+#define LED_DATA_PIN 6	// data output pin for LED. 6 for UNO, 0 for ATTiny85
 
 // inputs
 #define BUTTON_PIN A1	// input pin for momentary button
