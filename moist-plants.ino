@@ -115,11 +115,11 @@ void updateLED() {
 		LED_LEVEL_MIN
 	);
 
-	// update only if the value changes
-	if (ledLevel != newLedLevel) {
-		ledLevel = newLedLevel;
-		setLedLevel(ledLevel);
-	}
+	// update led level only if the value changes
+	if (ledLevel != newLedLevel) ledLevel = newLedLevel;
+
+	// update led level & brightness
+	setLedLevel(ledLevel);
 }
 
 /**
